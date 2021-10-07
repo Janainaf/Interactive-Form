@@ -88,16 +88,22 @@ document.getElementById("payment").onchange = function () {
 
 // ********************* Form validation *******************
 document.querySelector("form").onsubmit = function () {
-  // if (document.getElementById("name").value == "") {
-  //   alert("Error: Input is empty!");
-  // }
-  // if (document.getElementById("email").value == "") {
-  //   alert("Error: Input is empty!");
-  // }
-  // if (document.querySelectorAll("input[type=checkbox]").checked == 1) {
-  //   alert("Error: Input is empty!");
-  // }
-  // if (document.getElementById("paypal")) {
-  //   alert("Error: Input is empty!");
-  // }
+  var regName = /(.|\s)*\S(.|\s)*/;
+  var name = document.getElementById("name");
+  if (regName.test(name.value) == false) {
+    alert("Invalid Name");
+    name.focus();
+    return false;
+  }
+  var regEmail = /(.|\s)*\S(.|\s)*/;
+  var email = document.getElementById("email");
+  if (regEmail.test(email.value) == false) {
+    alert("Invalid Email");
+    email.focus();
+    return false;
+  }
+  if (sum == 0) {
+    alert("Error: Check a box!");
+    return false;
+  }
 };
