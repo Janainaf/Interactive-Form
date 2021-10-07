@@ -18,6 +18,7 @@ document.getElementById("title").onchange = function () {
 // needs SERIOUSLY refactoring
 
 document.getElementById("shirt-colors").style.display = "none";
+
 document.getElementById("design").onchange = function () {
   document.getElementById("shirt-colors").style.display = "block";
 
@@ -45,6 +46,9 @@ document.getElementById("design").onchange = function () {
 
 var checkBoxes = document.querySelectorAll("input[type=checkbox]");
 let sum = 0;
+if (sum < 0) {
+  sum = 0;
+}
 
 checkBoxes.forEach(function (checkbox) {
   checkbox.addEventListener("change", function () {
@@ -52,19 +56,48 @@ checkBoxes.forEach(function (checkbox) {
     sum += box;
     document.getElementById("activities-cost").innerHTML = "Total: $" + sum;
   });
+  window.onload = function () {
+    // console.log("try to checkbox.checked = false");
+    checkbox.checked = false;
+  };
 });
 
 // ********************* "Payment Info" section *******************
-//need to finish it - use select to loop through option values... like the active button
 // set credit card default selected
-
-selectElement("payment", "credit-card");
-document.getElementById("paypal").style.display = "none";
-document.getElementById("bitcoin").style.display = "none";
 
 function selectElement(id, valueToSelect) {
   let element = document.getElementById(id);
   element.value = valueToSelect;
 }
 
+selectElement("payment", "credit-card");
+document.getElementById("paypal").style.display = "none";
+document.getElementById("bitcoin").style.display = "none";
+
+var paymentMethods = ["credit-card", "paypal", "bitcoin"];
+
+document.getElementById("payment").onchange = function () {
+  for (var i = 0; i < paymentMethods.length; i++) {
+    document.getElementById(paymentMethods[i]).style.display = "none";
+    console.log(paymentMethods[i]);
+  }
+  var payIndex = document.getElementById("payment").selectedIndex;
+  console.log(paymentMethods[payIndex]);
+  document.getElementById(paymentMethods[payIndex - 1]).style.display = "block";
+};
+
 // ********************* Form validation *******************
+document.querySelector("form").onsubmit = function () {
+  // if (document.getElementById("name").value == "") {
+  //   alert("Error: Input is empty!");
+  // }
+  // if (document.getElementById("email").value == "") {
+  //   alert("Error: Input is empty!");
+  // }
+  // if (document.querySelectorAll("input[type=checkbox]").checked == 1) {
+  //   alert("Error: Input is empty!");
+  // }
+  // if (document.getElementById("paypal")) {
+  //   alert("Error: Input is empty!");
+  // }
+};
