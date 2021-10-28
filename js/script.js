@@ -3,6 +3,9 @@ const nameElement = document.getElementById("name");
 const email = document.getElementById("email");
 const creditCard = document.getElementById("cc-num");
 const languageTotalElement = document.querySelector("#language-total");
+const activities = document.getElementById("activities");
+const zipCode = document.getElementById("zip");
+const creditCardCvv = document.getElementById("cvv");
 
 window.onload = function () {
   checkBoxes.forEach(function (checkbox) {
@@ -99,50 +102,90 @@ document.getElementById("payment").onchange = function () {
 
 // ********************* Form validation *******************
 
-document.querySelector("form").onsubmit = function (e) {
-  e.preventDefault();
-  // Only call `preventDefault` on the `event` object if one or more of the required fields is invalid.
+form.addEventListener("submit", logSubmit);
 
+// create function to focus on .not-valid
+
+function logSubmit(event) {
   var regName = /(.|\s)*\S(.|\s)*/;
   if (regName.test(nameElement.value) == false) {
+    event.preventDefault();
     document.getElementById("name-hint").style.display = "block";
-    nameElement.parentElement.classList.add(".not-valid");
-    nameElement.focus();
-    return false;
+    nameElement.parentElement.classList.add("not-valid");
   } else {
-    nameElement.parentElement.classList.add(".valid");
+    nameElement.parentElement.classList.remove("not-valid");
+    nameElement.parentElement.classList.add("valid");
+    document.getElementById("name-hint").style.display = "none";
   }
 
   var regEmail = /.+\@.+\.(com)/;
   if (regEmail.test(email.value) == false) {
+    event.preventDefault();
     document.getElementById("email-hint").style.display = "block";
-    email.parentElement.classList.add(".not-valid");
-    email.focus();
-    return false;
+    email.parentElement.classList.add("not-valid");
+  } else {
+    document.getElementById("email-hint").style.display = "none";
+    email.parentElement.classList.remove("not-valid");
+    email.parentElement.classList.add("valid");
   }
 
   if (sum == 0) {
     document.getElementById("activities-hint").style.display = "block";
-    // xxx.parentElement.classList.add(".not-valid");
-    return false;
+    activities.firstElementChild.classList.add("not-valid");
+
+    event.preventDefault();
+  } else {
+    document.getElementById("activities-hint").style.display = "none";
+    activities.firstElementChild.classList.remove("not-valid");
+    activities.firstElementChild.classList.add("valid");
   }
 
   // If and only if credit card is the selected payment method:
 
   if (document.getElementById("payment").selectedIndex === 1) {
-    var regCardNumber = /(.|\s)*\S(.|\s)*/;
-
-    // The "Card number" field must contain a 13 - 16 digit credit card number with no dashes or spaces. The value does not need to be a real credit card number.
+    var regCardNumber = /^[0-9]{13,16}$/gm;
+    var regZipCode = /^[0-9]{5}$/gm;
+    var regCvv = /^[0-9]{3}$/gm;
 
     if (regCardNumber.test(creditCard.value) == false) {
       document.getElementById("cc-hint").style.display = "block";
-      return false;
+      document.querySelector(".payment-methods").classList.add("not-valid");
+      event.preventDefault();
+    } else {
+      document.querySelector(".payment-methods").classList.add("valid");
+      document.getElementById("cc-hint").style.display = "none";
+      document.querySelector(".payment-methods").classList.remove("not-valid");
+    }
+    if (regZipCode.test(zipCode.value) == false) {
+      document.getElementById("zip-hint").style.display = "block";
+      document.querySelector(".payment-methods").classList.add("not-valid");
+      event.preventDefault();
+    } else {
+      document.querySelector(".payment-methods").classList.add("valid");
+      document.getElementById("zip-hint").style.display = "none";
+      document.querySelector(".payment-methods").classList.remove("not-valid");
     }
 
+    if (regCvv.test(creditCardCvv.value) == false) {
+      document.getElementById("cvv-hint").style.display = "block";
+      document.querySelector(".payment-methods").classList.add("not-valid");
+      event.preventDefault();
+    } else {
+      document.querySelector(".payment-methods").classList.add("valid");
+      document.getElementById("cvv-hint").style.display = "none";
+      document.querySelector(".payment-methods").classList.remove("not-valid");
+    }
     // The "Zip code" field must contain a 5 digit number.
+    // The "CVV" field must contain a 3 digit number.
+  } else {
+    document.querySelector(".payment-methods").classList.remove("not-valid");
+    document.querySelector(".payment-methods").classList.add("valid");
+    document.getElementById("cc-hint").style.display = "none";
   }
-  // The "CVV" field must contain a 3 digit number.
-};
+
+  const invalid = document.querySelector(".not-valid");
+  invalid.focus();
+}
 
 // ********************* Accessibility *******************
 
@@ -151,7 +194,21 @@ document.querySelector("form").onsubmit = function (e) {
     course.parentElement.classList.add("focus")
   );
   course.addEventListener("blur", (e) => {
-    console.log("focusin!");
+    const active = document.querySelector(".focus");
+    if (active) active.classList.remove("focus");
+  });
+});
+
+// If a required field’s input is not valid when the form is submitted,
+//  a validation error message, warning icon and color are displayed.
+// If a required field’s input is valid when the form is submitted,
+// a checkmark icon is displayed and no error indicators are displayed.
+
+[...document.querySelectorAll("input[type=checkbox]")].forEach((course) => {
+  course.addEventListener("focus", (e) =>
+    course.parentElement.classList.add("focus")
+  );
+  course.addEventListener("blur", (e) => {
     const active = document.querySelector(".focus");
     if (active) active.classList.remove("focus");
   });
