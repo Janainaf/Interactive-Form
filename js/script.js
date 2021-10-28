@@ -6,6 +6,7 @@ const languageTotalElement = document.querySelector("#language-total");
 const activities = document.getElementById("activities");
 const zipCode = document.getElementById("zip");
 const creditCardCvv = document.getElementById("cvv");
+const payment = document.getElementById("payment");
 
 window.onload = function () {
   checkBoxes.forEach(function (checkbox) {
@@ -13,6 +14,8 @@ window.onload = function () {
     nameElement.value = "";
     email.value = "";
     creditCard.value = "";
+    zipCode.value = "";
+    creditCardCvv.value = "";
   });
 };
 
@@ -92,19 +95,17 @@ document.getElementById("bitcoin").style.display = "none";
 
 var paymentMethods = ["credit-card", "paypal", "bitcoin"];
 
-document.getElementById("payment").onchange = function () {
+payment.onchange = function () {
   for (var i = 0; i < paymentMethods.length; i++) {
     document.getElementById(paymentMethods[i]).style.display = "none";
   }
-  var payIndex = document.getElementById("payment").selectedIndex;
+  var payIndex = payment.selectedIndex;
   document.getElementById(paymentMethods[payIndex - 1]).style.display = "block";
 };
 
 // ********************* Form validation *******************
 
 form.addEventListener("submit", logSubmit);
-
-// create function to focus on .not-valid
 
 function logSubmit(event) {
   var regName = /(.|\s)*\S(.|\s)*/;
@@ -131,78 +132,69 @@ function logSubmit(event) {
 
   if (sum == 0) {
     document.getElementById("activities-hint").style.display = "block";
-    activities.firstElementChild.classList.add("not-valid");
-
+    document
+      .getElementById("activities-box")
+      .parentElement.classList.add("not-valid");
     event.preventDefault();
   } else {
     document.getElementById("activities-hint").style.display = "none";
-    activities.firstElementChild.classList.remove("not-valid");
-    activities.firstElementChild.classList.add("valid");
+    document
+      .getElementById("activities-box")
+      .parentElement.classList.remove("not-valid");
+    document
+      .getElementById("activities-box")
+      .parentElement.classList.add("valid");
   }
 
   // If and only if credit card is the selected payment method:
 
-  if (document.getElementById("payment").selectedIndex === 1) {
-    var regCardNumber = /^[0-9]{13,16}$/gm;
-    var regZipCode = /^[0-9]{5}$/gm;
-    var regCvv = /^[0-9]{3}$/gm;
+  const regCardNumber = /^[0-9]{13,16}$/gm;
+  const regZipCode = /^[0-9]{5}$/gm;
+  const regCvv = /^[0-9]{3}$/gm;
 
+  if (payment.selectedIndex === 1) {
     if (regCardNumber.test(creditCard.value) == false) {
+      event.preventDefault();
       document.getElementById("cc-hint").style.display = "block";
-      document.querySelector(".payment-methods").classList.add("not-valid");
-      event.preventDefault();
+      payment.parentElement.classList.add("not-valid");
     } else {
-      document.querySelector(".payment-methods").classList.add("valid");
       document.getElementById("cc-hint").style.display = "none";
-      document.querySelector(".payment-methods").classList.remove("not-valid");
+      payment.parentElement.classList.remove("not-valid");
+      payment.parentElement.classList.add("valid");
     }
+
     if (regZipCode.test(zipCode.value) == false) {
-      document.getElementById("zip-hint").style.display = "block";
-      document.querySelector(".payment-methods").classList.add("not-valid");
       event.preventDefault();
+      document.getElementById("zip-hint").style.display = "block";
+      payment.parentElement.classList.add("not-valid");
     } else {
-      document.querySelector(".payment-methods").classList.add("valid");
       document.getElementById("zip-hint").style.display = "none";
-      document.querySelector(".payment-methods").classList.remove("not-valid");
+      payment.parentElement.classList.remove("not-valid");
+      payment.parentElement.classList.add("valid");
     }
 
     if (regCvv.test(creditCardCvv.value) == false) {
-      document.getElementById("cvv-hint").style.display = "block";
-      document.querySelector(".payment-methods").classList.add("not-valid");
       event.preventDefault();
+      document.getElementById("cvv-hint").style.display = "block";
+      payment.parentElement.classList.add("not-valid");
     } else {
-      document.querySelector(".payment-methods").classList.add("valid");
       document.getElementById("cvv-hint").style.display = "none";
-      document.querySelector(".payment-methods").classList.remove("not-valid");
+      payment.parentElement.classList.remove("not-valid");
+      payment.parentElement.classList.add("valid");
     }
-    // The "Zip code" field must contain a 5 digit number.
-    // The "CVV" field must contain a 3 digit number.
-  } else {
-    document.querySelector(".payment-methods").classList.remove("not-valid");
-    document.querySelector(".payment-methods").classList.add("valid");
-    document.getElementById("cc-hint").style.display = "none";
   }
+
+  // else {
+  //   document.querySelector(".payment-methods").classList.remove("not-valid");
+  //   document.querySelector(".payment-methods").classList.add("valid");
+  //   document.getElementById("cc-hint").style.display = "none";
+  // }
 
   const invalid = document.querySelector(".not-valid");
   invalid.focus();
 }
 
 // ********************* Accessibility *******************
-
-[...document.querySelectorAll("input[type=checkbox]")].forEach((course) => {
-  course.addEventListener("focus", (e) =>
-    course.parentElement.classList.add("focus")
-  );
-  course.addEventListener("blur", (e) => {
-    const active = document.querySelector(".focus");
-    if (active) active.classList.remove("focus");
-  });
-});
-
-// If a required field’s input is not valid when the form is submitted,
-//  a validation error message, warning icon and color are displayed.
-// If a required field’s input is valid when the form is submitted,
-// a checkmark icon is displayed and no error indicators are displayed.
 
 [...document.querySelectorAll("input[type=checkbox]")].forEach((course) => {
   course.addEventListener("focus", (e) =>
