@@ -1,3 +1,5 @@
+// Constants used along the code
+
 const form = document.querySelector("form");
 const nameElement = document.getElementById("name");
 const email = document.getElementById("email");
@@ -7,6 +9,9 @@ const activities = document.getElementById("activities");
 const zipCode = document.getElementById("zip");
 const creditCardCvv = document.getElementById("cvv");
 const payment = document.getElementById("payment");
+const paymentbox = document.querySelector(".payment-method-box");
+
+// When the page is refreshed, most of it is cleaned and previous inputs removed
 
 window.onload = function () {
   checkBoxes.forEach(function (checkbox) {
@@ -19,12 +24,11 @@ window.onload = function () {
   });
 };
 
-//*******************  Focus on Name *******************
+//*******************  Adds focus to name filed  *******************
 
 nameElement.focus();
 
 //*******************  Job Title *******************
-// Reminder:  visibility and display are different and don't behave the same
 
 const jobTitle = document.getElementById("title");
 const otherJob = document.getElementById("other-job-role");
@@ -39,21 +43,26 @@ jobTitle.onchange = function () {
 };
 
 //*******************  Tshirt *******************
-// needs SERIOUSLY refactoring
 
-const shirtColors = document.getElementById("shirt-colors");
+const shirtColors = document.getElementById("color");
 const shirtDesign = document.getElementById("design");
+shirtColors.disabled = true;
 
-shirtColors.style.display = "none";
+shirtDesign.addEventListener("change", teeSelection);
 
-shirtDesign.onchange = function () {
-  shirtColors.style.display = "block";
-
+function teeSelection() {
   Array.from(document.querySelectorAll("[data-theme]")).forEach(function (tee) {
+    shirtColors.disabled = false;
+    document
+      .getElementById("color")
+      .firstElementChild.removeAttribute("selected");
     tee.style.display = "none";
   });
 
   if (shirtDesign.value == "heart js") {
+    document
+      .querySelector("[data-theme='heart js']")
+      .setAttribute("selected", true);
     document
       .querySelectorAll("[data-theme='heart js']")
       .forEach(function (heartTee) {
@@ -63,12 +72,16 @@ shirtDesign.onchange = function () {
 
   if (shirtDesign.value == "js puns") {
     document
+      .querySelector("[data-theme='js puns']")
+      .setAttribute("selected", true);
+
+    document
       .querySelectorAll("[data-theme='js puns']")
       .forEach(function (punTee) {
         punTee.style.display = "block";
       });
   }
-};
+}
 // *******************  Total*******************
 
 var checkBoxes = document.querySelectorAll("input[type=checkbox]");
@@ -107,7 +120,20 @@ payment.onchange = function () {
 
 form.addEventListener("submit", logSubmit);
 
+//*************************  Extra *****************************
+
+/* Commented out for accessibility reason, this function shows in real time while user is filling the form 
+if any information is missing */
+
+// form.addEventListener("change", logSubmit);
+
+/* Form validation and validation errors to  users.
+Displa hint and errors messages are connected to validation
+*/
+
 function logSubmit(event) {
+  //Name field cannot be blank
+
   var regName = /(.|\s)*\S(.|\s)*/;
   if (regName.test(nameElement.value) == false) {
     event.preventDefault();
@@ -119,7 +145,9 @@ function logSubmit(event) {
     document.getElementById("name-hint").style.display = "none";
   }
 
-  var regEmail = /.+\@.+\.(com)/;
+  //email must have at least two characters + 1 dot + some caracters and .com
+
+  var regEmail = /.{2,}\@.{2,}\.(com)/gm;
   if (regEmail.test(email.value) == false) {
     event.preventDefault();
     document.getElementById("email-hint").style.display = "block";
@@ -129,6 +157,8 @@ function logSubmit(event) {
     email.parentElement.classList.remove("not-valid");
     email.parentElement.classList.add("valid");
   }
+
+  // The "Register for Activities" section must have at least one activity selected.
 
   if (sum == 0) {
     document.getElementById("activities-hint").style.display = "block";
@@ -146,55 +176,61 @@ function logSubmit(event) {
       .parentElement.classList.add("valid");
   }
 
-  // If and only if credit card is the selected payment method:
+  // Validation if and only if credit card is the selected payment method
 
   const regCardNumber = /^[0-9]{13,16}$/gm;
   const regZipCode = /^[0-9]{5}$/gm;
   const regCvv = /^[0-9]{3}$/gm;
+  const testCard = regCardNumber.test(creditCard.value);
+  const testZip = regZipCode.test(zipCode.value);
+  const testCvv = regCvv.test(creditCardCvv.value);
+
+  const addInvalid = paymentbox.firstElementChild.classList.add("not-valid");
+
+  if (payment.selectedIndex !== 1) {
+    paymentbox.firstElementChild.classList.remove("not-valid");
+    paymentbox.firstElementChild.classList.add("valid");
+    document.getElementById("cc-hint").style.display = "none";
+  }
+
+  if (testCard && testZip && testCvv) {
+    paymentbox.firstElementChild.classList.remove("not-valid");
+    paymentbox.firstElementChild.classList.add("valid");
+  }
 
   if (payment.selectedIndex === 1) {
-    if (regCardNumber.test(creditCard.value) == false) {
+    if (testCard == false) {
       event.preventDefault();
       document.getElementById("cc-hint").style.display = "block";
-      payment.parentElement.classList.add("not-valid");
+      addInvalid;
     } else {
       document.getElementById("cc-hint").style.display = "none";
-      payment.parentElement.classList.remove("not-valid");
-      payment.parentElement.classList.add("valid");
     }
 
-    if (regZipCode.test(zipCode.value) == false) {
+    if (testZip == false) {
       event.preventDefault();
       document.getElementById("zip-hint").style.display = "block";
-      payment.parentElement.classList.add("not-valid");
+      addInvalid;
     } else {
       document.getElementById("zip-hint").style.display = "none";
-      payment.parentElement.classList.remove("not-valid");
-      payment.parentElement.classList.add("valid");
     }
 
-    if (regCvv.test(creditCardCvv.value) == false) {
+    if (testCvv == false) {
       event.preventDefault();
       document.getElementById("cvv-hint").style.display = "block";
-      payment.parentElement.classList.add("not-valid");
+      addInvalid;
     } else {
       document.getElementById("cvv-hint").style.display = "none";
-      payment.parentElement.classList.remove("not-valid");
-      payment.parentElement.classList.add("valid");
     }
   }
 
-  // else {
-  //   document.querySelector(".payment-methods").classList.remove("not-valid");
-  //   document.querySelector(".payment-methods").classList.add("valid");
-  //   document.getElementById("cc-hint").style.display = "none";
-  // }
-
   const invalid = document.querySelector(".not-valid");
-  invalid.focus();
+  if (invalid !== null) {
+    invalid.focus();
+  }
 }
 
-// ********************* Accessibility *******************
+// Makes the focus states of the activities more obvious to all users
 
 [...document.querySelectorAll("input[type=checkbox]")].forEach((course) => {
   course.addEventListener("focus", (e) =>
